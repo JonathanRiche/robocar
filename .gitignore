@@ -1,0 +1,39 @@
+# Zig build artifacts
+zig-out/
+zig-cache/
+.zig-cache/
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.bin
+*.elf
+*.hex
+*.map
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# MicroZig specific
+*.uf2
+*.bin
+*.hex
+
+# Debug files
+*.dSYM/
+
+# Testing
+test-results/
+
+# Dependencies cache
+deps/
+vendor/
