@@ -11,7 +11,7 @@ pub fn build(b: *std.Build) void {
 
     const firmware = mb.add_firmware(.{
         .name = "robocar",
-        .target = mb.ports.rp2xxx.boards.raspberrypi.pico,
+        .target = mb.ports.rp2xxx.boards.raspberrypi.pico2_arm,
         .optimize = .ReleaseSmall,
         .root_source_file = b.path("src/main.zig"),
     });
@@ -21,4 +21,3 @@ pub fn build(b: *std.Build) void {
     mb.install_firmware(firmware, .{});
     mb.install_firmware(firmware, .{ .format = .elf });
 }
-
