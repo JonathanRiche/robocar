@@ -19,12 +19,31 @@ Robocar is an embedded systems project built together with my son. We're using M
 robocar/
 ├── src/
 │   ├── main.zig          # Main firmware entry point
-│   └── root.zig          # Root module
+│   ├── root.zig          # Root module
+│   └── modules/          # Hardware driver modules
+│       ├── led_ws2812b.zig  # WS2812B addressable LED driver
+│       └── oled.zig         # SSD1306 OLED display driver
 ├── docs/
-│   └── microzig-targets.md  # MicroZig target reference
+│   ├── microzig-targets.md  # MicroZig target reference
+│   ├── ws2812b-setup.md     # WS2812B LED setup guide
+│   └── ws2812b-timing-troubleshooting.md  # Timing troubleshooting
 ├── build.zig             # Build configuration
 ├── build.zig.zon         # Dependencies
 └── README.md
+```
+
+### Modular Architecture
+
+The project uses a modular approach where hardware drivers are organized as reusable modules in `src/modules/`:
+
+- **led_ws2812b.zig**: WS2812B addressable RGB LED driver using PIO state machine
+- **oled.zig**: SSD1306 128x64 OLED display driver with I2C, framebuffer, and text rendering
+
+Each module is self-contained and can be imported into `main.zig` as needed:
+
+```zig
+const led_ws2812b = @import("modules/led_ws2812b.zig");
+const oled = @import("modules/oled.zig");
 ```
 
 ## Dependencies
@@ -83,18 +102,38 @@ See `docs/microzig-targets.md` for more target options.
 
 ELF files can be used with debuggers like OpenOCD and GDB for debugging via SWD.
 
-## Features (Planned)
+## Features
 
+### Implemented
+- [x] **WS2812B LED Driver** - PIO-based addressable RGB LED control with precise 800kHz timing
+- [x] **SSD1306 OLED Display** - I2C OLED driver with 1024-byte framebuffer and text rendering
+- [x] **Modular Architecture** - Reusable hardware driver modules
+
+### Planned
 - [ ] Motor control (PWM)
 - [ ] Sensor integration (ultrasonic, IR, etc.)
 - [ ] Wireless control interface
 - [ ] Autonomous navigation
 - [ ] Battery monitoring
-- [ ] LED status indicators
+
+## Hardware Modules
+
+### WS2812B Addressable LEDs
+- **GPIO**: 2 (Data)
+- **Features**: PIO state machine, RGB color control, color cycling
+- **Docs**: [WS2812B Setup Guide](docs/ws2812b-setup.md)
+
+### SSD1306 OLED Display
+- **I2C Bus**: I2C0
+- **GPIO**: 4 (SDA), 5 (SCL)
+- **Resolution**: 128x64 pixels
+- **Features**: Text rendering, 5x7 font, framebuffer, pixel control
 
 ## Documentation
 
 - [MicroZig Targets Reference](docs/microzig-targets.md) - Detailed information about available targets and configurations
+- [WS2812B Setup Guide](docs/ws2812b-setup.md) - WS2812B LED hardware and software setup
+- [WS2812B Timing Troubleshooting](docs/ws2812b-timing-troubleshooting.md) - Clock speed and timing fixes
 
 ## Resources
 
