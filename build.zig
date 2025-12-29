@@ -9,11 +9,16 @@ pub fn build(b: *std.Build) void {
     const mz_dep = b.dependency("microzig", .{});
     const mb = MicroBuild.init(b, mz_dep) orelse return;
 
+    const font8x8_dep = b.dependency("font8x8", .{});
+
     const firmware = mb.add_firmware(.{
         .name = "robocar",
         .target = mb.ports.rp2xxx.boards.raspberrypi.pico2_arm,
         .optimize = .ReleaseSmall,
         .root_source_file = b.path("src/main.zig"),
+        .imports = &.{
+            .{ .name = "font8x8", .module = font8x8_dep.module("font8x8") },
+        },
     });
 
     // We call this twice to demonstrate that the default binary output for
