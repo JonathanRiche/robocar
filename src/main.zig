@@ -5,6 +5,7 @@ const time = rp2xxx.time;
 const gpio = rp2xxx.gpio;
 const i2c = rp2xxx.i2c;
 const font8x8 = @import("font8x8");
+const oled = @import("modules/oled_SH1106.zig");
 
 const i2c0 = i2c.instance.num(0);
 const empty_row: []const u8 = " " ** 16;
@@ -16,12 +17,30 @@ pub fn main() void {
     var backing_buffer: [buffer_size]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&backing_buffer);
 
+    //NOTE: SET PINS Here
+
+    //NOTE: These pins are for oled display
     const sda_pin = gpio.num(8);
     const scl_pin = gpio.num(9);
+
+    //NOTE: These pins are for the i2s mic
+    //Serial clock pin
+    const sck_pin = gpio.num(10);
+    //Word select pin
+    const ws_pin = gpio.num(11);
+    //Serial data pin
+    const sd_pin = gpio.num(12);
+
     inline for (&.{ scl_pin, sda_pin }) |pin| {
         pin.set_slew_rate(.slow);
         pin.set_schmitt_trigger_enabled(true);
         pin.set_function(.i2c);
+    }
+
+    inline for (&.{ sck_pin, ws_pin, sd_pin }) |pin| {
+        // pin.set_slew_rate(.fast);
+        // pin.set_schmitt_trigger_enabled(true);
+        pin.set_function(.pio0);
     }
 
     rp2xxx.i2c.I2C.apply(i2c0, .{ .baud_rate = 400_000, .clock_config = rp2xxx.clock_config });
@@ -41,15 +60,17 @@ pub fn main() void {
     lcd.clear_screen(false) catch unreachable;
     lcd.write_gdram(font8x8.Fonts.draw(&buff, print_val)) catch unreachable;
 
+    //Sleep before an action with RPX
     time.sleep_ms(2000);
 
-    for (0..60) |i| {
+    //NOTE: purposely forcing 9 iterations to test the display if wanted we will make dynamic later and change temp buf
+    for (0..10) |i| {
         var aa = std.heap.ArenaAllocator.init(fba.allocator());
         defer aa.deinit();
         var temp_buf: [7]u8 = undefined;
         const str = std.fmt.bufPrint(&temp_buf, "Hello#{}", .{i}) catch unreachable;
         var counter_buf: [80]u8 = undefined;
-        const text_centered = center_to_screen(&counter_buf, str);
+        const text_centered = oled.center_to_screen(&counter_buf, str, empty_row, four_rows);
 
         const text = font8x8.Fonts.drawAlloc(aa.allocator(), text_centered) catch continue;
 
@@ -58,27 +79,4 @@ pub fn main() void {
 
         time.sleep_ms(1000);
     }
-}
-
-fn center_to_screen(buf: []u8, str: []u8) []u8 {
-    const ldc_row_len = empty_row.len;
-    const four_rows_len = four_rows.len;
-    const padding = @divTrunc(ldc_row_len - str.len, 2);
-
-    // Copy the initial four rows
-    @memcpy(buf[0..four_rows_len], four_rows);
-
-    // Add left padding
-    const left_pad_start = four_rows_len;
-    const left_pad_end = left_pad_start + padding;
-    @memset(buf[left_pad_start..left_pad_end], ' ');
-
-    // Copy the centered string
-    const str_start = left_pad_end;
-    const str_end = str_start + str.len;
-    @memcpy(buf[str_start..str_end], str);
-
-    // Add right padding
-    @memset(buf[str_end..buf.len], ' ');
-    return buf;
 }
