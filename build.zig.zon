@@ -33,9 +33,12 @@
     // internet connectivity.
     .dependencies = .{
         .microzig = .{
-            .url = "https://github.com/ZigEmbeddedGroup/microzig/releases/download/0.15.0/microzig.tar.gz",
-            .hash = "microzig-0.15.0-D20YSTUgCADpOaRtQ4SOk0HJ_E4342rgS9m3LQGhITbd",
+            .path = "../microzig",
         },
+        // .microzig = .{
+        //     .url = "https://github.com/ZigEmbeddedGroup/microzig/releases/download/0.15.0/microzig.tar.gz",
+        //     .hash = "microzig-0.15.0-D20YSTUgCADpOaRtQ4SOk0HJ_E4342rgS9m3LQGhITbd",
+        // },
         .font8x8 = .{
             .url = "git+https://github.com/Gnyblast/zig-ssd1306-gddram-fonts#84dd5fab70ddc1198eef1cd1305cc82f08f419dc",
             .hash = "ssd1306_font_8x8-0.0.0-oGb_cERcAAA6NJzWDOMepgnY6r4blNEHjpkldDaRAui5",

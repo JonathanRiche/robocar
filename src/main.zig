@@ -8,15 +8,20 @@ const i2c = rp2xxx.i2c;
 const font8x8 = @import("font8x8");
 const oled = @import("modules/oled_SH1106.zig");
 
+const wifi = @import("modules/wifi.zig");
+
 const i2c0 = i2c.instance.num(0);
 const empty_row: []const u8 = " " ** 16;
 const four_rows = empty_row ** 4;
 
-pub fn main() void {
+pub fn main() !void {
     // Safe buffer size for rp2xxx to allocate, value can change for other chips
     const buffer_size = 200 * 1024; // 200 KB
     var backing_buffer: [buffer_size]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&backing_buffer);
+
+    // Set up wifi
+    try wifi.set_up_wifi();
 
     //NOTE: SET PINS Here
 
@@ -26,23 +31,23 @@ pub fn main() void {
 
     //NOTE: These pins are for the i2s mic
     //Serial clock pin
-    const sck_pin = gpio.num(10);
-    //Word select pin
-    const ws_pin = gpio.num(11);
-    //Serial data pin
-    const sd_pin = gpio.num(12);
-
+    // const sck_pin = gpio.num(10);
+    // //Word select pin
+    // const ws_pin = gpio.num(11);
+    // //Serial data pin
+    // const sd_pin = gpio.num(12);
+    //
     inline for (&.{ scl_pin, sda_pin }) |pin| {
         pin.set_slew_rate(.slow);
         pin.set_schmitt_trigger_enabled(true);
         pin.set_function(.i2c);
     }
 
-    inline for (&.{ sck_pin, ws_pin, sd_pin }) |pin| {
-        // pin.set_slew_rate(.fast);
-        // pin.set_schmitt_trigger_enabled(true);
-        pin.set_function(.pio0);
-    }
+    // inline for (&.{ sck_pin, ws_pin, sd_pin }) |pin| {
+    //     // pin.set_slew_rate(.fast);
+    //     // pin.set_schmitt_trigger_enabled(true);
+    //     pin.set_function(.pio0);
+    // }
 
     rp2xxx.i2c.I2C.apply(i2c0, .{ .baud_rate = 400_000, .clock_config = rp2xxx.clock_config });
 

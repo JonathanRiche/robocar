@@ -11,6 +11,15 @@ pub fn build(b: *std.Build) void {
 
     const font8x8_dep = b.dependency("font8x8", .{});
 
+    // 1. Define the command-line options
+    const ssid = b.option([]const u8, "ssid", "WiFi SSID") orelse "DEFAULT_SSID";
+    const pass = b.option([]const u8, "pass", "WiFi Password") orelse "DEFAULT_PASSWORD";
+
+    // 2. Create the Options object
+    const opts = b.addOptions();
+    opts.addOption([]const u8, "ssid", ssid);
+    opts.addOption([]const u8, "pass", pass);
+
     const firmware = mb.add_firmware(.{
         .name = "robocar",
         .target = mb.ports.rp2xxx.boards.raspberrypi.pico2_arm,
@@ -18,6 +27,8 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/main.zig"),
         .imports = &.{
             .{ .name = "font8x8", .module = font8x8_dep.module("font8x8") },
+            // 3. Add the options as a module named "config"
+            .{ .name = "config", .module = opts.createModule() },
         },
     });
 

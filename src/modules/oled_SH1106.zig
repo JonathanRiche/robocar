@@ -1,4 +1,4 @@
-fn set_text() void {}
+// fn set_text() void {}
 
 pub fn center_to_screen(buf: []u8, str: []u8, empty_row: []const u8, four_rows: []const u8) []u8 {
     const ldc_row_len = empty_row.len;

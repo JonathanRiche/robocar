@@ -48,10 +48,13 @@ const oled = @import("modules/oled.zig");
 
 ## Dependencies
 
-- **MicroZig**: Embedded Zig framework (v0.15.0)
+- **MicroZig**: Embedded Zig framework (latest main branch - **NOT v0.15.0**)
   - Provides hardware abstraction layer (HAL)
   - RP2xxx port for Raspberry Pi Pico support
   - Target definitions and build system integration
+  - **WiFi driver support** (requires latest code from main branch)
+  
+  **Important**: You must clone the latest development version from GitHub - see "Getting Started" section below for setup instructions.
 
 ## Getting Started
 
@@ -59,6 +62,29 @@ const oled = @import("modules/oled.zig");
 
 - Zig 0.15.1 or later
 - USB cable for programming the Pico 2
+
+### Important: MicroZig Setup
+
+**This project requires the latest development version of MicroZig** (not the released version) because it depends on the WiFi driver which is only available in the main branch.
+
+1. Clone MicroZig as a sibling directory to this project:
+
+```bash
+# Navigate to the parent directory (e.g., hardware/)
+cd ..
+
+# Clone the latest MicroZig from the main branch
+git clone https://github.com/ZigEmbeddedGroup/microzig.git
+
+# Your directory structure should look like:
+# hardware/
+# ├── robocar/     (this project)
+# └── microzig/    (latest main branch)
+```
+
+2. The `build.zig.zon` file is already configured to use the local MicroZig installation via a relative path (`../microzig`).
+
+**Note**: The released version (v0.15.0) does not include WiFi support. You MUST use the latest code from the main branch.
 
 ### Building
 
