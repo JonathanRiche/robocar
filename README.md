@@ -170,7 +170,7 @@ ELF files can be used with debuggers like OpenOCD and GDB for debugging via SWD.
 
 ## License
 
-[Add your license here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
