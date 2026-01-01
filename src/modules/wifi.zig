@@ -25,7 +25,7 @@ const WIFI_PASSWORD = config.pass;
 
 const WIFI_AUTH = Security.wpa2_psk;
 
-pub fn set_up_wifi() !void {
+pub fn set_up_wifi() ![]const u8 {
     uart_tx_pin.set_function(.uart);
     uart.apply(.{ .clock_config = rp2xxx.clock_config });
     rp2xxx.uart.init_logger(uart);
@@ -55,18 +55,18 @@ pub fn set_up_wifi() !void {
 
     if (!wifi.is_connected()) {
         std.log.err("Connection timeout!", .{});
-        return;
-    }
+        return "Not Connected";
+    } else return "Connected";
 
-    std.log.info("Connected!", .{});
-    std.log.info("Listening for ethernet frames...", .{});
+    // std.log.info("Connected!", .{});
+    // std.log.info("Listening for ethernet frames...", .{});
 
     // Main loop - poll and receive frames
-    while (true) {
-        _ = runner.run();
-        if (runner.get_rx_frame()) |frame| {
-            // Handle ethernet frame here
-            std.log.info("Frame: {} bytes", .{frame.len});
-        }
-    }
+    // while (true) {
+    //     _ = runner.run();
+    //     if (runner.get_rx_frame()) |frame| {
+    //         // Handle ethernet frame here
+    //         std.log.info("Frame: {} bytes", .{frame.len});
+    //     }
+    // }
 }
