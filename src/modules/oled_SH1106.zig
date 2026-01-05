@@ -4,7 +4,8 @@ const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
 
 const font8x8 = @import("font8x8");
-const EMPTY_ROW: []const u8 = " " ** 16;
+//was 16
+const EMPTY_ROW: []const u8 = " " ** 24;
 const FOUR_ROWS = EMPTY_ROW ** 4;
 
 const hardware_config = @import("../hardware_config.zig");
@@ -19,7 +20,7 @@ pub fn set_text(config: Text_Config) void {
     var aa = std.heap.ArenaAllocator.init(fba.allocator());
     defer aa.deinit();
 
-    var temp_buf: [7]u8 = undefined;
+    var temp_buf: [32]u8 = undefined;
     const str = std.fmt.bufPrint(&temp_buf, "{s}", .{screen_text}) catch "No Text";
     var counter_buf: [80]u8 = undefined;
     const text_centered = center_to_screen(&counter_buf, str, EMPTY_ROW, FOUR_ROWS);
@@ -27,6 +28,7 @@ pub fn set_text(config: Text_Config) void {
     const text = font8x8.Fonts.drawAlloc(aa.allocator(), text_centered) catch "No Font A";
 
     lcd.clear_screen(false) catch unreachable;
+    // lcd.write_full_display(*text) catch unreachable;
     lcd.write_gdram(text) catch unreachable;
 
     time.sleep_ms(config.default_sleep_time);
@@ -54,3 +56,20 @@ pub fn center_to_screen(buf: []u8, str: []const u8, empty_row: []const u8, four_
     @memset(buf[str_end..buf.len], ' ');
     return buf;
 }
+//NOTE: purposely forcing 9 iterations to test the display if wanted we will make dynamic later and change temp buf
+// for (0..10) |i| {
+//fba.reset();
+//     var aa = std.heap.ArenaAllocator.init(fba.allocator());
+//     defer aa.deinit();
+//     var temp_buf: [7]u8 = undefined;
+//     const str = std.fmt.bufPrint(&temp_buf, "Hello#{}", .{i}) catch unreachable;
+//     var counter_buf: [80]u8 = undefined;
+//     const text_centered = oled.center_to_screen(&counter_buf, str, empty_row, four_rows);
+//
+//     const text = font8x8.Fonts.drawAlloc(aa.allocator(), text_centered) catch continue;
+//
+//     oled.set_text(.{ .fba = fba, .lcd = lcd, .screen_text = "Hello#{}" });
+//     lcd.write_gdram(text) catch continue;
+//
+//     time.sleep_ms(1000);
+// }
